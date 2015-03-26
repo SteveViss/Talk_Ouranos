@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ouranos et PostgreSQL.</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Ouranos et PostgreSQL.">
+  <meta name="author" content="Steve Vissault">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/solarized_light.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="libraries/widgets/bootstrap/css/bootstrap.css"></link>
+<link rel=stylesheet href="libraries/widgets/nvd3/css/nv.d3.css"></link>
+<link rel=stylesheet href="libraries/widgets/nvd3/css/rNVD3.css"></link>
+<link rel=stylesheet href="libraries/widgets/leaflet/external/leaflet.css"></link>
+<link rel=stylesheet href="libraries/widgets/leaflet/external/leaflet-rCharts.css"></link>
+<link rel=stylesheet href="libraries/widgets/leaflet/external/legend.css"></link>
+<link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  <script src="libraries/widgets/nvd3/js/jquery-1.8.2.min.js"></script>
+<script src="libraries/widgets/nvd3/js/d3.v3.min.js"></script>
+<script src="libraries/widgets/nvd3/js/nv.d3.min-new.js"></script>
+<script src="libraries/widgets/nvd3/js/fisheye.js"></script>
+<script src="libraries/widgets/leaflet/external/leaflet.js"></script>
+<script src="libraries/widgets/leaflet/external/leaflet-providers.js"></script>
+<script src="libraries/widgets/leaflet/external/Control.FullScreen.js"></script>
+
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Ouranos et PostgreSQL.</h1>
+    <h2>Vers un stockage spatialisé des GCMs à haute résolution?</h2>
+    <p>Steve Vissault<br/>Chaire de recherche du Canada en biogéographie et écologie des métacommunautés</p>
+  </hgroup>
+  <article></article>  
+  <footer class = 'license'>
+    <a href='http://creativecommons.org/licenses/by-nc-sa/3.0/'>
+    <img width = '80px' src = 'http://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-nc-sa.png'>
+    </a>
+  </footer>
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="segue nobackground dark" id="slide-1" style="background:;">
+  <hgroup>
+    <h2>Mise en contexte...</h2>
+  </hgroup>
+  <article data-timings="">
+    
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-2" style="background:;">
+  <hgroup>
+    <h2>Contexte de stage</h2>
+  </hgroup>
+  <article data-timings="">
+    <div style='text-align: center;'>
+    <img src="./context1.png" alt="Context1" align="middle">
+</div>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-3" style="background:;">
+  <hgroup>
+    <h2>Contexte de stage</h2>
+  </hgroup>
+  <article data-timings="">
+    <div style='text-align: center;'>
+    <img src="./context2.png" alt="Context2" align="middle">
+</div>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-4" style="background:;">
+  <hgroup>
+    <h2>Contexte de stage</h2>
+  </hgroup>
+  <article data-timings="">
+    <div style='text-align: center;'>
+    <img src="./context3.png" alt="Context3" align="middle">
+</div>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-5" style="background:;">
+  <hgroup>
+    <h2>Identification et réponse aux besoins</h2>
+  </hgroup>
+  <article data-timings="">
+    <h3><strong>Objectif:</strong></h3>
+
+<blockquote>
+<p>Stocker les sorties climatiques d&#39;Ouranos (Fichier Matlab/HDF5) dans une base de données spatialisée pour l&#39;Est de l&#39;Amérique du Nord.</p>
+
+<p>-<strong>Données mensuelles pour 3 variables climatiques</strong>: 570 240 grilles</p>
+
+<p>-<strong>Données annuelles pour 19 biovariables climatiques</strong>: 300 960 grilles</p>
+</blockquote>
+
+<h3><strong>Un stage en trois volets...</strong></h3>
+
+<ol class = "build incremental">
+<li>Étude de faisabilité: Stockage et requêtes des grilles climatiques dans PostgreSQL (Automne 2014)</li>
+<li>Conceptualiser et réaliser la base de données spatialisée dans PostgreSQL (Hiver 2015)</li>
+<li>Créer un programme d&#39;importation performant des fichiers HDFs (sorties climatiques d&#39;Ouranos) vers la nouvelle base de données (Hiver 2015)</li>
+</ol>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-6" style="background:;">
+  <hgroup>
+    <h2>La couverture spatiale...</h2>
+  </hgroup>
+  <article data-timings="">
+    <div style='text-align: center'>
+    <img src="./cover_raster.png" alt="LogoPostgreSQL" align="middle">
+</div>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="segue nobackground dark" id="slide-7" style="background:;">
+  <hgroup>
+    <h2>Qu&#39;est-ce que PostgreSQL?</h2>
+  </hgroup>
+  <article data-timings="">
+    
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-8" style="background:;">
+  <hgroup>
+    <h2>Qu&#39;est-ce que PostgreSQL?</h2>
+  </hgroup>
+  <article data-timings="">
+    
+<div style='float:left;width:48%;' class='centered'>
+  <p>Un Système de Gestion de Base de données (SGBD) gratuit et openSource depuis 1989, composé de:</p>
+
+<ul class = "build incremental">
+<li><strong>Tables</strong>: Comprend des enregistrements</li>
+<li><strong>Clés primaires</strong>: Assure des enregistrement uniques</li>
+<li><strong>Jointures</strong>: Permet de créer des relations entre les tables</li>
+<li><strong>Indexes</strong>: Permet une recherche plus rapide</li>
+<li><strong>Intégrités référentielles:</strong> Garantie l&#39;intégrité des données </li>
+</ul>
+
+</div>
+<div style='float:right;width:48%;'>
+  <div style='text-align: center'>
+    <img src="./postgres.jpg" height="300" alt="LogoPostgreSQL" align="middle">
+</div>
+
+</div>
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-9" style="background:;">
+  <hgroup>
+    <h2>Volet 1: Conceptualisation de la base de données</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Pour illustrer et comprendre, voici la base de données Ouranos:</p>
+
+<div style='text-align: center'>
+    <img src="./quicc_for_dev.png" alt="Schema" align="middle">
+</div>
+
+<ul class = "build incremental">
+<li>Pour créer des champs (colonnes) de type raster, nous avons besoins de <strong>l&#39;extension PostGIS</strong>...</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="segue nobackground dark" id="slide-10" style="background:;">
+  <hgroup>
+    <h2>Qu&#39;est-ce que PostGIS?</h2>
+  </hgroup>
+  <article data-timings="">
+    
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-11" style="background:;">
+  <hgroup>
+    <h2>Qu&#39;est ce que l&#39;extension PostGIS ?</h2>
+  </hgroup>
+  <article data-timings="">
+    
+<div style='float:left;width:48%;' class='centered'>
+  <p>C&#39;est une cartouche spatiale qui permet de stocker et de manipuler des objets spatiaux à l&#39;intérieur de PostgreSQL.</p>
+
+<p><strong>Deux types d&#39;objets spatiaux:</strong></p>
+
+<ol>
+<li><strong>Geometrique</strong>
+
+<ul>
+<li>Polygones (Multi ou simple)</li>
+<li>Lignes</li>
+<li>Points (Multi ou simple)</li>
+</ul></li>
+<li><strong>Raster/Grilles</strong></li>
+</ol>
+
+</div>
+<div style='float:right;width:48%;'>
+  <div style='text-align: center; margin-top:50px '>
+    <img src="./PostGIS_logo.png" alt="LogoPostgreSQL" align="middle">
+</div>
+
+</div>
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-12" style="background:;">
+  <hgroup>
+    <h2>Qu&#39;elles sont les forces de PostGIS Raster?</h2>
+  </hgroup>
+  <article data-timings="">
+    
+<div style='float:left;width:48%;' class='centered'>
+  <p><strong>Avantages:</strong></p>
+
+<ol class = "build incremental">
+<li>Indexation spatiale</li>
+<li>Stockage des grilles en héxadecimale (Diminue le poids des grilles)</li>
+<li>Posséder des fonctions permettant de traiter spatialement ces objets nativement à l&#39;intérieur de la base de données (p.ex. Clip, Insersection/Interception, Aggregation spatiale et temporelle)</li>
+<li>Puissance de calcul (avec opérations matricielles)</li>
+</ol>
+
+</div>
+<div style='float:right;width:48%;'>
+  <div style='text-align: center; margin-top:50px'>
+    <img src="./PostGIS_logo.png" height="300" alt="LogoPostgreSQL" align="middle">
+</div>
+
+</div>
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="segue nobackground dark" id="slide-13" style="background:;">
+  <hgroup>
+    <h2>Volet 2: Importer les grilles climatiques...</h2>
+  </hgroup>
+  <article data-timings="">
+    
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-14" style="background:;">
+  <hgroup>
+    <h2>Des fichiers Matlab (HDF5) vers la base de données PostgreSQL...</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>L&#39;importation se fait dans l&#39;infrastructure de Colosse (Super-Calculateur de l&#39;U-Laval).</p>
+
+<div style='text-align: center'>
+    <img src="./workflow_ouranos.png" alt="WorkFlow" align="middle">
+</div>
+
+<p>Le programme raster2pgsql découpe chaque raster climatique en tuile de 38 x 20 pixels.</p>
+
+<p>Les grilles ne sont pas stockés en multibandes.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-15" style="background:;">
+  <hgroup>
+    <h2>Des fichiers Matlab (HDF5) vers la base de données PostgreSQL...</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Le programme et l&#39;infrastructure permet de traiter <strong>jusqu&#39;à 24 fichiers Matlab à la fois</strong>.</p>
+
+<p><strong>Vitesse de traitement d&#39;un fichier HDF par le programme R/raster2pgsql</strong>:</p>
+
+<ul>
+<li>12 minutes pour une importation des grilles mensuelles</li>
+<li>30 minutes pour une importation des grilles annuelles</li>
+</ul>
+
+<p><strong>Durée totale de l&#39;importation:</strong></p>
+
+<ul>
+<li>10-12 heures pour les grilles mensuelles </li>
+<li>24 heures pour les grilles annnuelles</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="segue nobackground dark" id="slide-16" style="background:;">
+  <hgroup>
+    <h2>Sinon, ca ressemble à quoi dans la BD?</h2>
+  </hgroup>
+  <article data-timings="">
+    
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-17" style="background:;">
+  <hgroup>
+    <h2>Quelques chiffres après importation...</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><strong>Poids des indexes et tables:</strong></p>
+
+<table><thead>
+<tr>
+<th>Relation</th>
+<th>Poids (data)</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>clim_rs.fut_clim_vars</td>
+<td>358 GB (58 GB data)</td>
+</tr>
+<tr>
+<td>clim_rs.fut_clim_biovars</td>
+<td>187 GB (30 GB data)</td>
+</tr>
+<tr>
+<td>clim_rs.idx_spatial_mth</td>
+<td>6226 MB (index)</td>
+</tr>
+<tr>
+<td>clim_rs.idx_mod_run_mth</td>
+<td>4983 MB (index)</td>
+</tr>
+<tr>
+<td>clim_rs.rs_pkey</td>
+<td>4696 MB (index)</td>
+</tr>
+<tr>
+<td>clim_rs.idx_spatial_bio</td>
+<td>3277 MB (index)</td>
+</tr>
+<tr>
+<td>clim_rs.idx_mod_run_bio</td>
+<td>2622 MB (index)</td>
+</tr>
+</tbody></table>
+
+<hr>
+
+<p>Table annuel avec 54 821 232 de lignes et mensuel avec 104 175 072 lignes</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="segue nobackground dark" id="slide-18" style="background:;">
+  <hgroup>
+    <h2>Comment interroger cette BD?</h2>
+  </hgroup>
+  <article data-timings="">
+    
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-19" style="background:;">
+  <hgroup>
+    <h2>Le language SQL</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>On interroge une base de données en utilisant le language SQL (Stuctured Query Language). 
+Il permet la manipulation des données via des instructions (<code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>...).</p>
+
+<div style='text-align: center; margin-top:50px'>
+    <img src="./ex1.png" alt="LogoPostgreSQL" align="middle">
+</div>
+
+<p><strong>Une requête simple</strong>:</p>
+
+<pre><code>SELECT rast, year_clim FROM clim_rs.past_clim_allbiovars 
+WHERE year_clim &gt;= 1960 OR year_clim &lt;=1970 AND biovar = &#39;annual_mean_temp&#39;;
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-20" style="background:;">
+  <hgroup>
+    <h2>Exemple de requête de manipulation spatiale sur raster</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><strong>Aggregation temporelle:</strong></p>
+
+<pre><code>SELECT ST_Union(rast,&#39;MEAN&#39;) as tavg_6070, biovar FROM clim_rs.past_clim_allbiovars 
+WHERE year_clim &gt;= 1960 OR year_clim &lt;= 1970
+GROUP BY biovar;
+</code></pre>
+
+<p>Liste des fonctions sur raster disponible sur <a href="http://postgis.net/docs/manual-2.1/RT_reference.html">postgis.net</a> </p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="segue nobackground dark" id="slide-21" style="background:;">
+  <hgroup>
+    <h2>Comment accéder à cette BD ?</h2>
+  </hgroup>
+  <article data-timings="">
+    
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-22" style="background:;">
+  <hgroup>
+    <h2>Via pgAdmin3...</h2>
+  </hgroup>
+  <article data-timings="">
+    <div style='text-align: center'>
+    <img src="./pgAdmin3.png" alt="pgAdmin" align="middle">
+</div>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-23" style="background:;">
+  <hgroup>
+    <h2>Via une librairie (driver) dans son language préféré</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">require(RPostgreSQL)
+
+dbname &lt;- &quot;quicc_for_dev&quot;
+dbhost &lt;- &quot;localhost&quot;
+dbuser &lt;- &#39;postgres&#39;
+dbport &lt;- 5433
+drv &lt;- dbDriver(&quot;PostgreSQL&quot;)
+
+# Connection à la base de données
+con &lt;- dbConnect(drv, host=dbhost, port=dbport, dbname=dbname,user=dbuser)
+
+# Écriture de la requête
+query_tmax_60 &lt;- &quot;
+    SELECT * FROM clim_rs.past_clim_allbiovars 
+    WHERE biovar = &#39;annual_maximum_temp&#39; AND year_clim = 1960&quot;
+
+# Éxécution de la requête 
+res &lt;- dbGetQuery(con,query_tmax_60)
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-24" style="background:;">
+  <hgroup>
+    <h2>Via une librairie (driver) dans son language préféré</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">str(res)
+</code></pre>
+
+<pre><code>## &#39;data.frame&#39;:    696 obs. of  5 variables:
+##  $ rs_id    : int  2120847 2120870 2120878 2121336 2121307 2121308 2121309 2121310 2121311 2121312 ...
+##  $ filename : chr  &quot;1960_sg300_14.asc&quot; &quot;1960_sg300_14.asc&quot; &quot;1960_sg300_14.asc&quot; &quot;1960_sg300_14.asc&quot; ...
+##  $ year_clim: int  1960 1960 1960 1960 1960 1960 1960 1960 1960 1960 ...
+##  $ biovar   : chr  &quot;annual_maximum_temp&quot; &quot;annual_maximum_temp&quot; &quot;annual_maximum_temp&quot; &quot;annual_maximum_temp&quot; ...
+##  $ rast     : chr  &quot;01000001001975ADBD4F55B53F1975ADBD4F55B5BF33A5F5B7040058C09DA223B9FCBF524000000000000000000000000000000000AD10000030001E004A003&quot;| __truncated__ &quot;01000001001975ADBD4F55B53F1975ADBD4F55B5BF226E4E2503005EC0AF0D15E3FC1F524000000000000000000000000000000000AD10000030001E004A003&quot;| __truncated__ &quot;01000001001975ADBD4F55B53F1975ADBD4F55B5BF39622D3E050056C0AF0D15E3FC1F524000000000000000000000000000000000AD10000030001E004A003&quot;| __truncated__ &quot;01000001001975ADBD4F55B53F1975ADBD4F55B5BF282B86AB03005CC0967D5704FF3F404000000000000000000000000000000000AD10000030001E004A003&quot;| __truncated__ ...
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-25" style="background:;">
+  <hgroup>
+    <h2>Visualiser dans R</h2>
+  </hgroup>
+  <article data-timings="">
+    <div style='text-align: center'>
+    <img src="./var1.jpg" alt="pgAdmin" align="middle">
+</div>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="segue nobackground dark" id="slide-26" style="background:;">
+  <hgroup>
+    <h2>Les Geoserveurs...</h2>
+  </hgroup>
+  <article data-timings="">
+    
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-27" style="background:;">
+  <hgroup>
+    <h2>Qu&#39;est ce qu&#39;un géoserveur ?</h2>
+  </hgroup>
+  <article data-timings="">
+    <blockquote>
+<p>C&#39;est un service (généralement) web fourni par un serveur et permettant à un client d&#39;extraire des données spatialisées via les protocoles HTTP.</p>
+</blockquote>
+
+<p><strong>Il en éxiste trois sortes:</strong></p>
+
+<ol>
+<li><strong>Web Mapping Service (WMS):</strong> Pour visualiser des vecteurs ou des grilles comme des images cartographiques (JPEG , PNG , TIFF)</li>
+<li><strong>Web Feature Service (WFS):</strong> Pour extraire des données géographiques dans diverses format (GeoJSON, KML, GML)</li>
+<li><strong>Web Feature Service Transactional (WFS-T):</strong> Permet d&#39;interagir directement avec les base de données (édition des objets spatiaux envoyé par le serveur).</li>
+</ol>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-28" style="background:;">
+  <hgroup>
+    <h2>La solution possible pour Ouranos</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Selon le livre, <em>Postgis in Action (Obe et Hsu, 2011)</em>, ce qui est recommandé pour vos besoins (soit 1. Visualisation et 2. Extraction) est <a href="http://mapserver.org/">MapServer</a>, car il supporte toutes les extensions de PostGIS.</p>
+
+<div style='text-align: center; margin-top:50px'>
+    <img src="./mapServer.png" alt="LogoPostgreSQL" align="middle">
+</div>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-29" style="background:;">
+  <hgroup>
+    <h2>Un Exemple de Web Mapping Service (WMS) via R/Leaflet</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">require(rCharts)
+require(knitr)
+map1 = Leaflet$new()
+map1$setView(c(52.731631, -70.156347), 4)
+map1$tileLayer(&quot;http://{s}.tile.openstreetmap.se/hydda/base/{z}/{x}/{y}.png&quot;)
+map1$set(width = 800, height = 550)
+map1$save(&#39;maps/map1.html&#39;, cdn = TRUE)
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-30" style="background:;">
+  <article data-timings="">
+    <iframe data-src='maps/map1.html' seamless onload=lzld(this)></iframe>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-31" style="background:;">
+  <hgroup>
+    <h2>Connecter le Web Mapping Service (WMS) avec PostgreSQL</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Un exemple avec le Bas-Saint-Laurent...</p>
+
+<pre><code class="r">query_climBSL &lt;- &quot;SELECT (ST_Intersection(rast,bsl.geom)).*, rs_id
+
+FROM clim_rs.past_clim_allbiovars,
+(SELECT geom FROM map_qc.regio_s WHERE res_nm_reg = &#39;Bas-Saint-Laurent&#39;) as bsl
+
+WHERE year_clim=2010 AND biovar = &#39;annual_mean_temp&#39;
+AND ST_Intersects(rast,bsl.geom);&quot;
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-32" style="background:;">
+  <article data-timings="">
+    <iframe data-src='maps/map2.html' seamless onload=lzld(this)></iframe>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-33" style="background:;">
+  <hgroup>
+    <h3><strong>Grille climatique de la température moyenne annuelle (°C) pour l&#39;année 2010</strong></h3>
+  </hgroup>
+  <article data-timings="">
+    <p>(Bas-Saint-Laurent, interpolation par ANUSPLIN)</p>
+
+<iframe data-src='maps/map3.html' seamless onload=lzld(this)></iframe>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='Mise en contexte...'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Contexte de stage'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Contexte de stage'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='Contexte de stage'>
+         4
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=5 title='Identification et réponse aux besoins'>
+         5
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=6 title='La couverture spatiale...'>
+         6
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=7 title='Qu&#39;est-ce que PostgreSQL?'>
+         7
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=8 title='Qu&#39;est-ce que PostgreSQL?'>
+         8
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=9 title='Volet 1: Conceptualisation de la base de données'>
+         9
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=10 title='Qu&#39;est-ce que PostGIS?'>
+         10
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=11 title='Qu&#39;est ce que l&#39;extension PostGIS ?'>
+         11
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=12 title='Qu&#39;elles sont les forces de PostGIS Raster?'>
+         12
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=13 title='Volet 2: Importer les grilles climatiques...'>
+         13
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=14 title='Des fichiers Matlab (HDF5) vers la base de données PostgreSQL...'>
+         14
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=15 title='Des fichiers Matlab (HDF5) vers la base de données PostgreSQL...'>
+         15
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=16 title='Sinon, ca ressemble à quoi dans la BD?'>
+         16
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=17 title='Quelques chiffres après importation...'>
+         17
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=18 title='Comment interroger cette BD?'>
+         18
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=19 title='Le language SQL'>
+         19
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=20 title='Exemple de requête de manipulation spatiale sur raster'>
+         20
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=21 title='Comment accéder à cette BD ?'>
+         21
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=22 title='Via pgAdmin3...'>
+         22
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=23 title='Via une librairie (driver) dans son language préféré'>
+         23
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=24 title='Via une librairie (driver) dans son language préféré'>
+         24
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=25 title='Visualiser dans R'>
+         25
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=26 title='Les Geoserveurs...'>
+         26
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=27 title='Qu&#39;est ce qu&#39;un géoserveur ?'>
+         27
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=28 title='La solution possible pour Ouranos'>
+         28
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=29 title='Un Exemple de Web Mapping Service (WMS) via R/Leaflet'>
+         29
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=30 title=''>
+         30
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=31 title='Connecter le Web Mapping Service (WMS) avec PostgreSQL'>
+         31
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=32 title=''>
+         32
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=33 title='<strong>Grille climatique de la température moyenne annuelle (°C) pour l&#39;année 2010</strong>'>
+         33
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  <script src="libraries/widgets/bootstrap/js/bootstrap.min.js"></script>
+<script src="libraries/widgets/bootstrap/js/bootbox.min.js"></script>
+
+  <script>  
+  $(function (){ 
+    $("#example").popover(); 
+    $("[rel='tooltip']").tooltip(); 
+  });  
+  </script>  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>

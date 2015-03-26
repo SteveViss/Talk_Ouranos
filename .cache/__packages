@@ -1,0 +1,11 @@
+base
+slidify
+slidifyLibraries
+devtools
+leaflet
+rCharts
+knitr
+rMaps
+DBI
+RPostgreSQL
+RJSONIO
