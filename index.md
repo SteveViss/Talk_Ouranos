@@ -167,7 +167,7 @@ L'importation se fait dans l'infrastructure de Colosse (Super-Calculateur de l'U
 
 Le programme raster2pgsql découpe chaque raster climatique en tuile de 38 x 20 pixels.
 
-Les grilles ne sont pas stockés en multibandes.
+Les grilles ne sont pas stockées en multibandes.
 
 --- 
 
