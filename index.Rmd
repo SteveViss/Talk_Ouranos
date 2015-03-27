@@ -416,16 +416,7 @@ map3 = Leaflet$new()
 map3$setView(c(48.310290, -68.443202), 7)
 map3$tileLayer("http://{s}.tile.openstreetmap.se/hydda/base/{z}/{x}/{y}.png")
 map3$set(width = 800, height = 500)
-map3$geoJson(climBSL,
-    style = "#!function(feature) {
-    var rgn2col = {6:'#BD0026',5:'#E31A1C',4:'#FC4E2A',3:'#FD8D3C',2:'#FEB24C',1:'#FED976'};     
-    return {
-      color: rgn2col[feature.properties['f2']],
-        weight: 2,
-        opacity: 1,
-        dashArray: '3',
-        fillOpacity: 0.7
-    }; } !#")
+map3$geoJson(climBSL)
 legend_vec = c('#BD0026' = '>6°C','#E31A1C' = '6-5°C','#FC4E2A' = '5-4°C','#FD8D3C' = '4-3°C','#FEB24C' = '3-2°C','#FED976' = '<2°C')
 map3$legend(position = 'bottomleft', colors = names(legend_vec),labels = as.vector(legend_vec))
 map3$save('maps/map3.html')
